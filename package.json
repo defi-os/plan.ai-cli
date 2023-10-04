@@ -1,0 +1,22 @@
+{
+  "name": "cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "cli"
+  },
+  "author": "Tanmay Munjal",
+  "license": "ISC",
+  "dependencies": {
+    "@project-serum/anchor": "^0.26.0",
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.78.5",
+    "inquirer": "^9.2.11"
+  },
+  "type": "module"
+}

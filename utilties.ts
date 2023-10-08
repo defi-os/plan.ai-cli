@@ -1,10 +1,20 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { Keypair, PublicKey } from '@solana/web3.js'
+import fs from 'fs'
+import * as anchor from '@project-serum/anchor'
+import dotenv from 'dotenv'
+// @ts-ignore
+import findConfig from 'find-config'
+
+dotenv.config({ path: findConfig('.env') })
+const { web3 } = anchor
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const PROGRAM_ID = new web3.PublicKey(process.env.SkillStaking_PROGRAM_ID)
 
-export function loadKeypairFromFile(filename) {
+export function loadKeypairFromFile(filename: string) {
     const secret = JSON.parse(fs.readFileSync(filename).toString())
     const secretKey = Uint8Array.from(secret)
     return Keypair.fromSecretKey(secretKey)
@@ -16,12 +26,15 @@ export const readConfig = () => {
     return JSON.parse(configString)
 }
 
-export const getNameRouterAccount = async (signingName, signatureVersion) => {
+export const getNameRouterAccount = async (
+    signingName: string,
+    signatureVersion: string
+) => {
     const [nameRouterAccount] = await web3.PublicKey.findProgramAddress(
         [
             Buffer.from(signingName),
             Buffer.from(signatureVersion.toString()),
-            authKeyPair.publicKey.toBuffer(),
+            Buffer.from(process.env.AuthKey),
         ],
         PROGRAM_ID
     )

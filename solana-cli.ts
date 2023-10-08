@@ -2,15 +2,19 @@
 
 import fs from 'fs'
 import path from 'path'
+// @ts-ignore
 import inquirer from 'inquirer'
+import { fileURLToPath } from 'url'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 // Questions to ask the user
 const questions = [
     {
         type: 'input',
         name: 'keyPath',
         message: 'Please enter the path to your Solana key:',
-        validate: (input) => {
+        validate: (input: string) => {
             const filePath = path.resolve(input)
             if (fs.existsSync(filePath)) {
                 return true
@@ -23,14 +27,14 @@ const questions = [
         name: 'rpcUrl',
         message: 'Please enter the Solana RPC URL:',
         default: 'https://api.devnet.solana.com', // default can be changed as per requirement
-        validate: (input) => !!input && input.startsWith('http'),
+        validate: (input: string) => !!input && input.startsWith('http'),
     },
 ]
 
 // Prompt the user
 inquirer
     .prompt(questions)
-    .then((answers) => {
+    .then((answers:any) => {
         // Resolve the absolute path
         const keyPath = path.resolve(answers.keyPath)
 
@@ -53,6 +57,6 @@ inquirer
             'Solana key path and RPC URL have been set successfully in the CLI config.'
         )
     })
-    .catch((error) => {
+    .catch((error: Error) => {
         console.error('An error occurred:', error)
     })

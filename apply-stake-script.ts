@@ -2,17 +2,24 @@
 
 import { exec } from 'child_process'
 import fs from 'fs'
-import { get_pda_from_seeds, mintAddress } from './utilties.mjs'
-import { program } from './program.mjs'
-import { rpcConfig } from './rpcConfig.mjs'
+import { get_pda_from_seeds,program } from './program.js'
+import { rpcConfig } from './rpcConfig.js'
 import * as anchor from '@project-serum/anchor'
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     getAssociatedTokenAddress,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { loadKeypairFromFile, readConfig, mintAddress } from './utilties.mjs'
+import {
+    loadKeypairFromFile,
+    readConfig,
+    mintAddress,
+} from './utilties.js'
+// @ts-ignore
+import { BN } from 'bn.js';
+import { PublicKey } from '@solana/web3.js'
 
+const { web3 } = anchor
 // Check if filepath is provided
 if (process.argv.length < 3) {
     console.error('Please provide the file path of the JavaScript file.')
@@ -42,16 +49,17 @@ exec(`node ${filePath}`, (error, stdout, stderr) => {
     // Parse the output as an array of JSONs
     try {
         // Given JSON string
-        const jsonString = eval('(' + stdout + ')')
+        const jsonString:Array<JSON> = eval('(' + stdout + ')')
         const staker = loadKeypairFromFile(readConfig().solanaKeyPath)
-        for (data in jsonString) {
+        for (let i = 0; i < jsonString.length; i++) {
+            let data = jsonString[i];
             let skill = data.skill
-            let freelancer = data.freelancer
-            let stakeAmount = data.stakeAmount
+            let freelancer = new PublicKey(data.freelancer)
+            let stakeAmount = data.stake
             get_pda_from_seeds([
                 Buffer.from('skillStake'),
                 Buffer.from(skill),
-                Buffer.from(freelancer),
+                freelancer.toBuffer(),
             ]).then((skillStakeAccount) => {
                 let [skillStake] = skillStakeAccount
                 getAssociatedTokenAddress(mintAddress, skillStake, true).then(
@@ -59,18 +67,18 @@ exec(`node ${filePath}`, (error, stdout, stderr) => {
                         let skillStakeTokenAddress = skillStakeTokenAccount
                         getAssociatedTokenAddress(
                             mintAddress,
-                            staker,
+                            staker.publicKey,
                             false
                         ).then((stakerToken) => {
                             let stakerTokenAddress = stakerToken
                             get_pda_from_seeds([
                                 Buffer.from('freelance'),
                                 freelancer.toBuffer(),
-                            ]).then((freelanceAccount) => {
+                            ]).then(([freelanceAccount]) => {
                                 program.methods
                                     .stakeSkillset(
                                         skill,
-                                        new anchor.BN(stakeAmount)
+                                        new BN(stakeAmount)
                                     )
                                     .accounts({
                                         staker: staker.publicKey,
@@ -88,7 +96,13 @@ exec(`node ${filePath}`, (error, stdout, stderr) => {
                                     })
                                     .signers([staker])
                                     .rpc(rpcConfig)
-                                    .then(console.log('Stake completed'))
+                                    .then((_) => {
+                                        console.log('Stake completed')
+                                    })
+                                    .catch((err:Error)=>{
+                                        console.log("Stake failed")
+                                        console.log(err)
+                                    })
                             })
                         })
                     }

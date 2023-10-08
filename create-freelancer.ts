@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-
-import path from 'path'
-import { fileURLToPath } from 'url'
+// @ts-ignore
 import inquirer from 'inquirer'
 import * as anchor from '@project-serum/anchor'
 import { program, get_pda_from_seeds } from './program.js'
@@ -9,9 +7,10 @@ import {
     loadKeypairFromFile,
     readConfig,
     getNameRouterAccount,
-} from './utilties.mjs'
+} from './utilties.js'
+import { rpcConfig } from './rpcConfig.js'
 const { web3 } = anchor
-async function uploadJsonToIpfs(jsonObj) {
+async function uploadJsonToIpfs(jsonObj: object) {
     try {
         const formData = new FormData()
         formData.append('file', JSON.stringify(jsonObj))
@@ -37,44 +36,41 @@ async function uploadJsonToIpfs(jsonObj) {
     }
 }
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
 // Questions to ask the user
 const questions = [
     {
         type: 'input',
         name: 'linkedinUrl',
         message: 'Please enter your likedin url: ',
-        validate: (input) => !!input,
+        validate: (input: string) => !!input,
     },
     {
         type: 'input',
         name: 'githubUrl',
         message: 'Input your github url:  ',
-        validate: (input) => !!input,
+        validate: (input: string) => !!input,
     },
     {
         type: 'input',
         name: 'resumeUrl',
         message: 'Input your resume url: ',
-        validate: (input) => !!input,
+        validate: (input: string) => !!input,
     },
     {
         type: 'input',
         name: 'otherUrl',
         message: 'Any other Url you want to include: ',
-        validate: (input) => !!input,
+        validate: (input: string) => !!input,
     },
     {
         type: 'input',
         name: 'userName',
         message: 'User name of user doing freelance work',
-        validate: (input) => !!input,
+        validate: (input: string) => !!input,
     },
 ]
 
-inquirer.prompt(questions).then((answers) => {
+inquirer.prompt(questions).then((answers:any) => {
     const jobData = {
         linkedinUrl: answers.linkedinUrl,
         githubUrl: answers.githubUrl,
@@ -83,16 +79,16 @@ inquirer.prompt(questions).then((answers) => {
     }
     uploadJsonToIpfs(jobData).then((ipfsHash) => {
         const freelancer = loadKeypairFromFile(readConfig().solanaKeyPath)
-        getNameRouterAccount('defios.com', 1).then((nameRouterAccount) => {
+        getNameRouterAccount('defios.com', '1').then((nameRouterAccount) => {
             get_pda_from_seeds([
                 Buffer.from(answers.userName),
                 freelancer.publicKey.toBuffer(),
                 nameRouterAccount.toBuffer(),
-            ]).then((verifiedUserAccount) => {
+            ]).then(([verifiedUserAccount]) => {
                 get_pda_from_seeds([
                     Buffer.from('freelance'),
                     freelancer.publicKey.toBuffer(),
-                ]).then((freelanceAccount) => {
+                ]).then(([freelanceAccount]) => {
                     program.methods
                         .addFreelancer(ipfsHash)
                         .accounts({
@@ -103,6 +99,9 @@ inquirer.prompt(questions).then((answers) => {
                         })
                         .signers([freelancer])
                         .rpc(rpcConfig)
+                        .then((_) => {
+                            console.log('Freelancer created')
+                        })
                 })
             })
         })

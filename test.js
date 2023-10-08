@@ -1,1 +1,1 @@
-console.log([{"freelancer":"1","stake":2}])
+console.log([{ freelancer: '1', stake: 2 }])

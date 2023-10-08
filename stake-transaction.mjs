@@ -1,15 +1,6 @@
 #!/usr/bin/env node
 
-import fs from 'fs'
 import path from 'path'
-import {
-    Keypair,
-    Transaction,
-    TransactionInstruction,
-    Connection,
-    sendAndConfirmTransaction,
-    PublicKey,
-} from '@solana/web3.js'
 import { fileURLToPath } from 'url'
 import inquirer from 'inquirer'
 import * as anchor from '@project-serum/anchor'
@@ -20,7 +11,6 @@ import {
 } from '@solana/spl-token'
 import { rpcConfig } from './rpcConfig.mjs'
 import { program, get_pda_from_seeds } from './program.js'
-import { loadKeypairFromFile, readConfig } from './utilties.mjs'
 
 const { web3 } = anchor
 
@@ -50,9 +40,6 @@ const questions = [
 ]
 
 inquirer.prompt(questions).then((answers) => {
-    const mintAddress = new PublicKey(
-        '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
-    )
     get_pda_from_seeds([
         Buffer.from('skillStake'),
         Buffer.from(answers.skill),
@@ -68,7 +55,7 @@ inquirer.prompt(questions).then((answers) => {
                         const stakerTokenAddress = stakerToken
                         get_pda_from_seeds([
                             Buffer.from('freelance'),
-                            freelancer.publicKey.toBuffer(),
+                            freelancer.toBuffer(),
                         ]).then((freelanceAccount) => {
                             program.methods
                                 .stakeSkillset(

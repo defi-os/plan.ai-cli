@@ -1,11 +1,11 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { Keypair, PublicKey } from '@solana/web3.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-
-export function loadKeypairFromFile(filename: string): Keypair {
-    const secret = JSON.parse(fs.readFileSync(filename).toString()) as number[]
+export function loadKeypairFromFile(filename) {
+    const secret = JSON.parse(fs.readFileSync(filename).toString())
     const secretKey = Uint8Array.from(secret)
     return Keypair.fromSecretKey(secretKey)
 }
@@ -16,10 +16,7 @@ export const readConfig = () => {
     return JSON.parse(configString)
 }
 
-export const getNameRouterAccount = async (
-    signingName: string,
-    signatureVersion: number
-) => {
+export const getNameRouterAccount = async (signingName, signatureVersion) => {
     const [nameRouterAccount] = await web3.PublicKey.findProgramAddress(
         [
             Buffer.from(signingName),
@@ -30,3 +27,7 @@ export const getNameRouterAccount = async (
     )
     return nameRouterAccount
 }
+
+export const mintAddress = new PublicKey(
+    '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
+)

@@ -1,7 +1,7 @@
-const rpcConfig: object = {
+const rpcConfig = {
     skipPreflight: true,
     maxRetries: 5,
-    confirmation: "confirmed",
-  };
-  
-  export { rpcConfig };
+    confirmation: 'confirmed',
+}
+
+export { rpcConfig }

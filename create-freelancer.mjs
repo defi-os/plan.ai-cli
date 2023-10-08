@@ -83,7 +83,7 @@ inquirer.prompt(questions).then((answers) => {
     }
     uploadJsonToIpfs(jobData).then((ipfsHash) => {
         const freelancer = loadKeypairFromFile(readConfig().solanaKeyPath)
-        getNameRouterAccount('defios.com', 12).then((nameRouterAccount) => {
+        getNameRouterAccount('defios.com', 1).then((nameRouterAccount) => {
             get_pda_from_seeds([
                 Buffer.from(answers.userName),
                 freelancer.publicKey.toBuffer(),

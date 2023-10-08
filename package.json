@@ -27,5 +27,11 @@
         "eslint": "^8.51.0",
         "eslint-config-prettier": "^9.0.0",
         "prettier": "^3.0.3"
+    },
+    "bin": {
+        "setup-skill-staking": "./solana-cli.mjs",
+        "create-freelancer": "./create-freelancer.mjs",
+        "stake": "./stake-transaction.mjs",
+        "apply-stake-script": "./apply-stake-script.mjs"
     }
 }

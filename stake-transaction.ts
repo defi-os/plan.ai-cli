@@ -84,7 +84,7 @@ inquirer.prompt(questions).then((answers:any) => {
                             })
                             .catch((err:Error) => {
                                 console.log("Stake failed")
-                                console.log(err)
+                                console.log(err.message)
                             })
                     })
                 })

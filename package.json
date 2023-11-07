@@ -30,9 +30,9 @@
         "prettier": "^3.0.3"
     },
     "bin": {
-        "planai setup-skill-staking": "./solana-cli.mjs",
-        "planai create-freelancer": "./create-freelancer.mjs",
-        "planai stake": "./stake-transaction.mjs",
-        "planai apply-stake-script": "./apply-stake-script.mjs"
+        "planai-setup-skill-staking": "./dist/solana-cli.js",
+        "planai-create-freelancer": "./dist/create-freelancer.js",
+        "planai-stake": "./dist/stake-transaction.js",
+        "planai-apply-stake-script": "./dist/apply-stake-script.js"
     }
 }
